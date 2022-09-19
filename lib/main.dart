@@ -7,6 +7,10 @@ import 'package:flutter_loggy/flutter_loggy.dart';
 
 import 'package:tarot/views/tarot_app.dart';
 
+
+
 void main() {
+  Loggy.initLoggy();
+
   runApp(TarotApp());
 }

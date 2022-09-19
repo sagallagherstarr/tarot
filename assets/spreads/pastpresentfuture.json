@@ -1,0 +1,22 @@
+{
+  "name": "Past, Present, Future",
+  "description": "basic three-card layout",
+  "cardPositions": [
+    "Past",
+    "Present",
+    "Future"
+  ],
+  "layout": {
+    "center": {
+      "child": {
+        "row": {
+          "children": [
+            "Past",
+            "Present",
+            "Future"
+          ]
+        }
+      }
+    }
+  }
+}

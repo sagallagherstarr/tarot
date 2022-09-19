@@ -100,12 +100,22 @@ class Manifest extends ChangeNotifier with UiLoggy {
 
   late final List<JSON> spreads;
 
-  Manifest({
+  Manifest._internal() : super();
+
+  factory Manifest({
     String rawJson = "",
     Future<String>? future
-  }) : super() {
-    loggy.debug("Manifest constructor");
-    loggy.debug("rawJson is $rawJson");
+  }) {
+    // if this type is already registered, return the registered object
+    if (GetIt.I.isRegistered<Manifest>()) {
+      return GetIt.I<Manifest>();
+    }
+
+    // otherwise, create a new object from one of the provided params
+    final m = Manifest._internal();
+
+    m.loggy.debug("Manifest factory constructor");
+    m.loggy.debug("  rawJson is $rawJson");
 
     // we're set up to handle futures; if we were handed a bare string, convert
     // that to a future and then proceed.
@@ -113,35 +123,35 @@ class Manifest extends ChangeNotifier with UiLoggy {
 
     future.then((raw) { // this step exists in order to log the result
       // after this class has been debugged, simplify the chain considerably
-      loggy.debug("  raw is $raw");
+      m.loggy.debug("  raw is $raw");
       return raw;
     })
-        .catchError((e) {
+    .catchError((e) {
       final msg = "fetching from manifest bundle produced error $e";
-      loggy.debug("  $msg");
+      m.loggy.debug("  $msg");
       return '{ "error": "$msg" }';
     })
-        .then((s) {
-      loggy.debug("  attempting to parse to JSON");
+    .then((s) {
+      m.loggy.debug("  attempting to parse to JSON");
 
       // JSON.parse may? fail on the manifest - it should not fail on the
       // error message emitted above
       return JSON.parse(s);
     })
-        .catchError((e) {
+    .catchError((e) {
       // if we fail at parsing the manifest, we have failed the whole thing.
       // Notify our listeners so they can behold our failure!
 
       final msg = "parsing manifest produced error $e";
-      loggy.debug(msg);
-      rawAssets = JSON.parse('{ "error": "$msg" }');
-      spreads = <JSON>[];
-      notifyListeners();
+      m.loggy.debug(msg);
+      m.rawAssets = JSON.parse('{ "error": "$msg" }');
+      m.spreads = <JSON>[];
+      m.notifyListeners();
     })
-        .then((j) {
+    .then((j) {
       const matcher = "assets/spreads";
       // The asset manifest is always a JSON object, with a formal structure
-      spreads = j.mapValue.keys // what all is in here?
+      m.spreads = j.mapValue.keys // what all is in here?
           .filter((t) => t.startsWith(matcher)) // which parts are assets?
           .map((t) { // this piece - need to create a separate class for
         // spread objects, which will involve loading more assets from the
@@ -149,14 +159,16 @@ class Manifest extends ChangeNotifier with UiLoggy {
         // the list, though
         j.mapValue[t];
       })
-          .toList() as List<JSON>;
-      loggy.debug("spreads found, list is $spreads");
-      notifyListeners(); // success!
+      .toList() as List<JSON>;
+      m.loggy.debug("spreads found, list is $m.spreads");
+      m.notifyListeners(); // success!
     })
-        .catchError((e) {
-      loggy.debug("converting to spreads list didn't work. error $e");
-      notifyListeners(); // empty list, but the JSON object is still ready
+    .catchError((e) {
+      m.loggy.debug("converting to spreads list didn't work. error $e");
+      m.notifyListeners(); // empty list, but the JSON object is still ready
       // at this point.
     });
+
+    return m;
   }
 }

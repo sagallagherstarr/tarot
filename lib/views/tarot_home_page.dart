@@ -19,10 +19,12 @@ class TarotHomePage extends StatefulWidget with GetItStatefulWidgetMixin, UiLogg
 class _TarotHomePageState extends State<TarotHomePage> with GetItStateMixin, UiLoggy {
   int _counter = 0;
 
+  @override
   void initState() {
+    super.initState();
     // this exists specifically for debugging the Manifest class. Once that's done,
     // this can be removed.
-    // final m = Manifest(future: DefaultAssetBundle.of(context).loadString("AssetManifest.json"));
+    final m = Manifest(future: DefaultAssetBundle.of(context).loadString("AssetManifest.json"));
   }
 
   void _incrementCounter() {
