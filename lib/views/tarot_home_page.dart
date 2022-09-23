@@ -5,7 +5,7 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:loggy/loggy.dart';
 import 'package:flutter_loggy/flutter_loggy.dart';
 
-import 'package:tarot/global_settings.dart';
+import 'package:tarot/manifest.dart';
 
 class TarotHomePage extends StatefulWidget with GetItStatefulWidgetMixin, UiLoggy {
   TarotHomePage({super.key, required this.title});
@@ -24,7 +24,18 @@ class _TarotHomePageState extends State<TarotHomePage> with GetItStateMixin, UiL
     super.initState();
     // this exists specifically for debugging the Manifest class. Once that's done,
     // this can be removed.
-    final m = Manifest(future: DefaultAssetBundle.of(context).loadString("AssetManifest.json"));
+    final m = Manifest(DefaultAssetBundle.of(context).loadString("AssetManifest.json"));
+    m.addListener(changeUpdate);
+  }
+
+  void changeUpdate() {
+    loggy.debug("changeUpdate called.");
+    loggy.debug("  fetching manifest from GetIt.");
+
+    final man = GetIt.I<Manifest>();
+
+    loggy.debug("  manifest.rawAssets is ${man.assetMap}");
+    // loggy.debug("  manifest.spreads is ${man.spreads}");
   }
 
   void _incrementCounter() {
