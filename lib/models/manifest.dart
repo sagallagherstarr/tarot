@@ -1,4 +1,4 @@
-// import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 // import 'package:flutter/services.dart';
@@ -8,55 +8,53 @@ import 'package:get_it/get_it.dart';
 import 'package:loggy/loggy.dart';
 // import 'package:flutter_loggy/flutter_loggy.dart';
 // import 'package:fpdart/fpdart.dart';
-import 'package:g_json/g_json.dart';
+// import 'package:g_json/g_json.dart';
+
+// typedef JSON = Map<String, dynamic>;
 
 String errorAsString(String msg) => '{ "error": "$msg" }';
-JSON errorAsJSON(String msg) => JSON(errorAsString(msg));
+Map<String, dynamic> errorAsJSON(String msg) => jsonDecode(errorAsString(msg));
 
 // creating this class as a ChangeNotifier makes it inherently asynchronous
 // for the Widget tree, and GetIt's watch method.
 // this could also be implemented with assetMap as a ValueNotifier, rather than the
 // whole class as a change notifier
-class Manifest extends ChangeNotifier with UiLoggy {
-  late final JSON _assetMap;
+class Manifest with UiLoggy {
+  ValueNotifier<String> assetString = ValueNotifier<String>("{}");
+  ValueNotifier<dynamic> assetMap = ValueNotifier<dynamic>(jsonDecode("{}"));
 
   Manifest._internal() : super();
 
-  JSON get assetMap => _assetMap;
-  set assetMap(JSON newMap) {
-    _assetMap = newMap;
-
-    notifyListeners();
-  }
-
   Future<String> logRawAssetString(Future<String> rawAssetString) =>
     rawAssetString.then((rawAssetJSONString) {
-      // this step exists in order to log the result
-      // after this class has been debugged, simplify the chain considerably
-      loggy.debug("  raw is $rawAssetJSONString");
+      assetString.value = rawAssetJSONString;
+
       return rawAssetJSONString;
     }).catchError((e) {
       final msg = "fetching from manifest bundle produced error $e";
       loggy.debug("  $msg");
+      assetString.value = msg;
+
       return errorAsString(msg);
     });
 
-  Future<JSON> convertToJSON(Future<String> rawAssetString) =>
+  Future<dynamic> convertToJSON(Future<String> rawAssetString) =>
     rawAssetString.then((s) {
       loggy.debug("  attempting to parse to JSON");
 
-      final j = JSON.parse(s);
-      loggy.debug("  success; JSON.parse returned $j");
+      final j = jsonDecode(s);
+      // if (j is Map<String, dynamic>) { return j as Map<String, dynamic>}; };
 
-      // JSON.parse may? fail on the manifest - it should not fail on the
-      // error message emitted above
+      loggy.debug("  success; JSON.parse returned $j");
+      assetMap.value = j;
+
       return j;
     }).catchError((e) {
     // if we fail at parsing the manifest, we have failed the whole thing.
 
       final msg = "parsing manifest produced error $e";
       loggy.debug(msg);
-      assetMap = errorAsJSON(msg);
+      assetMap.value = errorAsJSON(msg);
     });
 
   factory Manifest(Future<String> future) {
@@ -68,7 +66,7 @@ class Manifest extends ChangeNotifier with UiLoggy {
     GetIt.I.registerSingleton<Manifest>(m);
 
     Future<String> ras = m.logRawAssetString(future);
-    Future<JSON> asm = m.convertToJSON(ras); // The side effects do the work here
+    // Future<JSON> asm = m.convertToJSON(ras); // The side effects do the work here
 
 /*
     future.then((rawAssetJSONString) {

@@ -5,7 +5,9 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:loggy/loggy.dart';
 import 'package:flutter_loggy/flutter_loggy.dart';
 
-import 'package:tarot/manifest.dart';
+import 'package:tarot/models/manifest.dart';
+
+import 'package:tarot/views/manifest_view.dart';
 
 class TarotHomePage extends StatefulWidget with GetItStatefulWidgetMixin, UiLoggy {
   TarotHomePage({super.key, required this.title});
@@ -25,7 +27,7 @@ class _TarotHomePageState extends State<TarotHomePage> with GetItStateMixin, UiL
     // this exists specifically for debugging the Manifest class. Once that's done,
     // this can be removed.
     final m = Manifest(DefaultAssetBundle.of(context).loadString("AssetManifest.json"));
-    m.addListener(changeUpdate);
+    m.assetMap.addListener(changeUpdate);
   }
 
   void changeUpdate() {
@@ -34,7 +36,7 @@ class _TarotHomePageState extends State<TarotHomePage> with GetItStateMixin, UiL
 
     final man = GetIt.I<Manifest>();
 
-    loggy.debug("  manifest.rawAssets is ${man.assetMap}");
+    loggy.debug("  manifest.rawAssets is ${man.assetMap.value}");
     // loggy.debug("  manifest.spreads is ${man.spreads}");
   }
 
@@ -52,13 +54,38 @@ class _TarotHomePageState extends State<TarotHomePage> with GetItStateMixin, UiL
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
+    return DefaultTabController(
+        initialIndex: 1,
+        length: 3,
+        child: Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        bottom: const TabBar(
+          tabs: <Widget>[
+            Tab(
+              text: "Manifest",
+            ),
+            Tab(
+              text: "Spreads",
+            ),
+            Tab(
+              icon: Icon(Icons.brightness_5_sharp),
+            ),
+          ],
+        ),
       ),
-      body: Center(
+      body:
+        TabBarView(
+          children: <Widget> [
+            ManifestPage(),
+            Placeholder(child: Text("Second")),
+            Placeholder(child: Text("Third")),
+          ]
+        ),
+/*
+        Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: Column(
@@ -78,6 +105,9 @@ class _TarotHomePageState extends State<TarotHomePage> with GetItStateMixin, UiL
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            ManifestView(),
+*/
+/*
             const Text(
               'You have pushed the button this many times:',
             ),
@@ -85,14 +115,18 @@ class _TarotHomePageState extends State<TarotHomePage> with GetItStateMixin, UiL
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+*//*
+
           ],
         ),
       ),
+*/
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    )
     );
   }
 }
