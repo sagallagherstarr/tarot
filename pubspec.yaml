@@ -43,6 +43,7 @@ dependencies:
   fpdart: ^0.2.0
   g_json: ^4.1.0
   flutter_json_view: ^0.4.0
+  collection: ^1.16.0
 
 dev_dependencies:
   flutter_test:

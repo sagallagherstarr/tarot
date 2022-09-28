@@ -6,8 +6,10 @@ import 'package:loggy/loggy.dart';
 import 'package:flutter_loggy/flutter_loggy.dart';
 
 import 'package:tarot/models/manifest.dart';
+import 'package:tarot/models/spreads.dart';
 
-import 'package:tarot/views/manifest_view.dart';
+import 'package:tarot/views/pages/manifest_page.dart';
+import 'package:tarot/views/pages/spreads_page.dart';
 
 class TarotHomePage extends StatefulWidget with GetItStatefulWidgetMixin, UiLoggy {
   TarotHomePage({super.key, required this.title});
@@ -28,6 +30,9 @@ class _TarotHomePageState extends State<TarotHomePage> with GetItStateMixin, UiL
     // this can be removed.
     final m = Manifest(DefaultAssetBundle.of(context).loadString("AssetManifest.json"));
     m.assetMap.addListener(changeUpdate);
+
+    final s = Spreads();
+    s.addListener(spreadsUpdate);
   }
 
   void changeUpdate() {
@@ -38,6 +43,16 @@ class _TarotHomePageState extends State<TarotHomePage> with GetItStateMixin, UiL
 
     loggy.debug("  manifest.rawAssets is ${man.assetMap.value}");
     // loggy.debug("  manifest.spreads is ${man.spreads}");
+  }
+
+  void spreadsUpdate() {
+    loggy.debug("spreadsUpdate called.");
+    loggy.debug("  fetching spreads singleton from GetIt.");
+
+    final spr = GetIt.I<Spreads>();
+    loggy.debug("  there are ${spr.length} spreads.");
+    loggy.debug("  spreads are named:");
+    spr.forEach((s) { loggy.debug("    ${s.name}"); });
   }
 
   void _incrementCounter() {
@@ -80,7 +95,7 @@ class _TarotHomePageState extends State<TarotHomePage> with GetItStateMixin, UiL
         TabBarView(
           children: <Widget> [
             ManifestPage(),
-            Placeholder(child: Text("Second")),
+            SpreadsPage(),
             Placeholder(child: Text("Third")),
           ]
         ),

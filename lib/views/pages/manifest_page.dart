@@ -12,6 +12,7 @@ import 'package:tarot/models/manifest.dart';
 class ManifestView extends StatelessWidget with GetItMixin, UiLoggy {
   ManifestView({Key? key}) : super(key: key);
 
+  @override
   Widget build(BuildContext context) {
     final assets = watchX((Manifest m) => m.assetString);
 
@@ -22,6 +23,7 @@ class ManifestView extends StatelessWidget with GetItMixin, UiLoggy {
 class ManifestPage extends StatelessWidget with GetItMixin, UiLoggy {
   ManifestPage({super.key});
 
+  @override
   Widget build(BuildContext context) {
     return ManifestView();
   }
