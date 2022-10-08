@@ -5,10 +5,14 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:loggy/loggy.dart';
 import 'package:flutter_loggy/flutter_loggy.dart';
 
+import 'package:tarot/models/globals.dart';
+import 'package:tarot/models/manifest.dart';
 import 'package:tarot/views/pages/tarot_home_page.dart';
 
 class TarotApp extends StatelessWidget with GetItMixin, UiLoggy {
-  TarotApp({super.key});
+  TarotApp({super.key}) {
+    Globals.createGlobals();
+  }
 
   // This widget is the root of your application.
   @override

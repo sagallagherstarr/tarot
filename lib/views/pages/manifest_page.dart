@@ -14,9 +14,9 @@ class ManifestView extends StatelessWidget with GetItMixin, UiLoggy {
 
   @override
   Widget build(BuildContext context) {
-    final assets = watchX((Manifest m) => m.assetString);
+    final assets = watchOnly((Manifest x) => x);
 
-    return JsonView.string(assets);
+    return JsonView.string(assets.assetString);
   }
 }
 

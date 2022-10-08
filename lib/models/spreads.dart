@@ -11,6 +11,8 @@ import 'package:get_it/get_it.dart';
 // import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:loggy/loggy.dart';
 
+import 'package:tarot/models/manifest.dart';
+
 class Spread {
   final bool fromManifest;
   final String name;
@@ -27,22 +29,10 @@ final testSpreadList = <Spread>[
 ];
 
 class Spreads extends DelegatingList<Spread> with ChangeNotifier, UiLoggy {
-  Spreads._internal() : super([]) {
-    // TODO: replace with void async loader, drop the future on the floor
-    // or, use a static or non-member async factory function that registers the
-    // singleton and performs the async init.
+  Spreads() : super(<Spread>[]) {
+
     addAll(testSpreadList);
-  }
-
-  factory Spreads() {
-    if (GetIt.I.isRegistered<Spreads>()) {
-      return GetIt.I<Spreads>();
-    }
-
-    Spreads s = Spreads._internal();
-    GetIt.I.registerSingleton<Spreads>(s);
-
-    return s;
+    notifyListeners();
   }
 
   @override
